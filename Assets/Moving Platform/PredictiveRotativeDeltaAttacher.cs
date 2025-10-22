@@ -1,7 +1,11 @@
 /*
  * 
- *  This script aims to record the change in position from one physicsUpdate to another, and apply this
- *  to the objects that are above it.
+ *  In this approach, we try to predict the changes that will be applied, so that we can add them *before* the physics Update
+ *  
+ *  The idea behind this is that if you calculate the delta to be applied before the physicsUpdate, your changes postPhysicsUpdate
+ *  should reflect also the calculated delta, right?
+ *  
+ *  In my project I implemented an interface for this sort of calculation. 
  *  
  */
 
@@ -10,15 +14,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class DeltaAttacher : MonoBehaviour
+public class PredictiveRotativeDeltaAttacher : MonoBehaviour
 {
-    // Deltas
-    private Vector2 oldPosition;
-    private Vector2 movementDelta;
 
     private List<Rigidbody2D> frameRigidbodies = new(); // Rigidbodies that are interacting
 
     private Rigidbody2D rb;
+
+    public RotatingPlatform platformControl;
 
     private void Awake()
     {
@@ -35,16 +38,11 @@ public class DeltaAttacher : MonoBehaviour
     void FixedUpdate()
     {
         // Adjustments
-        rb.MoveRotation(0);
 
-        // Calculate delta through position difference
-        movementDelta = rb.position - oldPosition;
+        rb.MoveRotation(0f);
 
         // Apply the movement delta to the objects
-        UpdateInteractorsPositions(movementDelta);
-
-        // Update the old rigidbody position
-        oldPosition = rb.position;
+        UpdateInteractorsPositions(platformControl.CalculateFragmentDelta(rb.position));
 
         // Clean list
         frameRigidbodies.Clear();

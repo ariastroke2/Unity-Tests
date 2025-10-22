@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovingPlatform : MonoBehaviour
@@ -19,6 +17,9 @@ public class MovingPlatform : MonoBehaviour
 
     private bool atTargetPos;
 
+    public Vector2 appliedDelta;
+    private Vector2 oldPosition;
+
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
@@ -27,11 +28,14 @@ public class MovingPlatform : MonoBehaviour
         modifiedPosition = ogPosition + targetPos;
     }
 
+    // This script is executed 
     void FixedUpdate()
     {
         if (restTimer > 0)
         {
             restTimer -= Time.fixedDeltaTime;
+
+            appliedDelta = Vector2.zero;
 
             return;
         }
@@ -40,11 +44,14 @@ public class MovingPlatform : MonoBehaviour
 
         Vector2 targetPosition = Vector2.Lerp(ogPosition, modifiedPosition, timer);
 
-        if(timer >= 1 || timer <= 0)
+        if (timer >= 1 || timer <= 0)
         {
             restTimer = restTime;
             atTargetPos = timer >= 1;
         }
+
+        appliedDelta = targetPosition - rigidBody.position;
+        oldPosition = targetPosition;
 
         rigidBody.MovePosition(targetPosition);
     }

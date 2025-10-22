@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterController : MonoBehaviour
@@ -24,7 +22,7 @@ public class CharacterController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody2D>();
     }
 
-    // Capture input, executed AFTER physics update
+    // Capture input
     void Update()
     {
         Vector2 velocity = rigidBody.velocity;
